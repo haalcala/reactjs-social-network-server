@@ -1,0 +1,23 @@
+{
+  "name": "social-network-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haalcala/reactjs-social-network-server.git"
+  },
+  "keywords": [
+    "reactjs",
+    "social-network"
+  ],
+  "author": "Harold Alcala",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/haalcala/reactjs-social-network-server/issues"
+  },
+  "homepage": "https://github.com/haalcala/reactjs-social-network-server#readme"
+}
