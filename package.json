@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "watch": "nodemon --watch src/**/*.ts --exec ts-node src/main.ts"
+    "watch": "nodemon -w src --exec ts-node src/main.ts"
   },
   "repository": {
     "type": "git",
