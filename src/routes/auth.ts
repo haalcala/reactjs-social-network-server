@@ -1,3 +1,4 @@
+import { MyUtil } from "../my_utils";
 import UserModel from "../../src/models/User";
 
 const bcrypt = require("bcrypt");
@@ -14,9 +15,7 @@ router.post("/register", async (req, res) => {
             throw "User already exists";
         }
 
-        const salt = await bcrypt.genSalt(10);
-
-        password = await bcrypt.hash(password, salt);
+        password = await MyUtil.encrypt(password);
 
         newUser = new UserModel({ username, name, email, password });
 
