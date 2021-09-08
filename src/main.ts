@@ -27,6 +27,14 @@ async function start() {
 
     await connect(DB_URL);
 
+    console.log("-------------------------------\nListing users:");
+
+    let users = await UserModel.find();
+
+    for (let user of users) {
+        console.log(user);
+    }
+
     let user = await UserModel.findOne({ name: "User222" });
 
     if (!user) {
@@ -35,7 +43,7 @@ async function start() {
             name: "User222",
             email: "user222@mydomain.com",
             avatar: "",
-            password: "bla",
+            password: "bla"
         });
 
         await user.save();
@@ -46,13 +54,7 @@ async function start() {
 
     console.log(user);
 
-    console.log("-------------------------------\nListing users:");
 
-    let users = await UserModel.find();
-
-    for (let user of users) {
-        console.log(user);
-    }
 }
 
 app.get("/", (req, res) => {
@@ -60,9 +62,9 @@ app.get("/", (req, res) => {
 });
 
 start()
+    .catch(console.error)
     .then(() => {
         app.listen(PORT);
 
         console.log("Listening on port", PORT);
     })
-    .catch(console.error);

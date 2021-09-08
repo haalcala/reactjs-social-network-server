@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserUdpatableUserFields } from "src/types";
+import { UserUdpatableUserFields } from "../types";
 import UserModel, { UserType } from "../models/User";
 import { MyUtil } from "../my_utils";
 
@@ -9,23 +9,33 @@ const router = Router();
 router.put(
     "/:id",
     [],
-    MyUtil.handleHttpRequest<{ id: string }, UserUdpatableUserFields>(async (req, res) => {
+    MyUtil.getHttpRequestHandler<{ id: string }, UserUdpatableUserFields & { id: string }>(async (req) => {
         const { log, user } = req;
         const { id } = req.params;
 
-        if (!user) {
-            throw "Must login first";
-        }
+        // log("Hello world")
+
+        // if (!user) {
+        //     throw "Must login first";
+        // }
 
         let updates: UserUdpatableUserFields = {};
 
-        if (user._id === req.params.id || user.isAdmin) {
-            if (req.body.password) {
-                let password = req.body.password;
+        const updatable_fields = ["city", "password", "relationship", "country", "name", "followers", "following", "email", "profilePicture", "converPicture", "desc", "hometown"]
 
-                password = await MyUtil.encrypt(password);
+        for (let field of Object.keys(req.body)) {
+            if (field !== "id") {
+                if (updatable_fields.indexOf(field) == -1) {
+                    throw `The field ${field} cannot be updated`
+                }
 
-                updates.password = password;
+                updates[field] = req.body[field]
+            }
+        }
+
+        if (req.body.id === req.params.id || user.isAdmin) {
+            if (updates.password) {
+                updates.password = await MyUtil.encrypt(updates.password);
             }
         }
 
@@ -45,7 +55,7 @@ router.put(
 router.delete(
     "/:id",
     [],
-    MyUtil.handleHttpRequest<{ id: string }, { id: string; isAdmin: boolean }>(async (req, res) => {
+    MyUtil.getHttpRequestHandler<{ id: string }, { id: string; isAdmin: boolean }>(async (req) => {
         const { log } = req;
 
         if (req.body.id === req.params.id || req.body.isAdmin) {
@@ -69,8 +79,35 @@ router.delete(
 );
 
 // get user
+router.get("/:id", [], MyUtil.getHttpRequestHandler<{ id: string }, { id: string }, { names: string[] }>(async (req) => {
+    if (req.body.id === req.params.id) {
+        const { id } = req.params;
+
+        const user = await UserModel.findById(id);
+
+        if (!user) {
+            throw { _error: "User not found", _error_code: 505 };
+        }
+
+        return { user }
+    }
+}))
 
 // follow user
+router.get("/:id/follow", [], MyUtil.getHttpRequestHandler<{ id: string }, { id: string }, { names: string[] }>(async (req) => {
+    if (req.body.id === req.params.id) {
+        const { id } = req.params;
+
+        const user = await UserModel.findById(id);
+
+        if (!user) {
+            throw { _error: "User not found", _error_code: 505 };
+        }
+
+        return { user }
+    }
+}))
+
 
 // unfollow user
 
