@@ -1,28 +1,31 @@
-import { request, response } from "express";
-import { ExpressRequest } from "./types";
+import { request, Response, response } from "express";
+import { ExpressRequest, ExpressResponse } from "./types";
 
 import * as bcrypt from "bcrypt";
 
 export namespace MyUtil {
-    export async function handleHttpRequest<T>(
-        req: any,
-        res: any,
-        handler: () => Promise<string | { _error?: string; _error_code?: number; _status?: string }>
-    ) {
-        try {
-            const result = await handler();
+    export function handleHttpRequest<Params = any, ReqBody = any, QueryParams = any>(
+        handler: (req: ExpressRequest<Params, ReqBody, QueryParams>, res: Response) => Promise<string | ExpressResponse>
+    ): (req: ExpressRequest<Params, ReqBody, QueryParams>, res: Response) => Promise<void> {
+        return async (req, res) => {
+            try {
+                const result = await handler(req, res);
 
-            if (typeof result === "string") {
-                res.json({ _status: result });
-            } else if (result._error || result._error_code > 0) {
-                res.status(500).json(result);
-            } else {
-                res.json(result);
+                if (typeof result === "string") {
+                    res.json({ _status: result });
+                } else if (result._error || result._error_code > 0) {
+                    res.status(500).json(result);
+                } else {
+                    res.json(result);
+                }
+            } catch (e) {
+                console.log(e);
+                res.status(500).json({
+                    _error: typeof e === "string" ? e : e.message,
+                    _error_code: e._error_code || 500,
+                });
             }
-        } catch (e) {
-            console.log(e);
-            res.status(500).json({ _error: typeof e === "string" ? e : e.message, _error_code: e._error_code || 500 });
-        }
+        };
     }
 
     export async function encrypt(value: string): Promise<string> {

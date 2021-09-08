@@ -1,23 +1,25 @@
 import { Router } from "express";
+import { UserUdpatableUserFields } from "src/types";
 import UserModel, { UserType } from "../models/User";
-import { ExpressRequest } from "src/types";
 import { MyUtil } from "../my_utils";
 
 const router = Router();
 
 // update user
-router.put("/:id", [], (req: ExpressRequest<{ id: string }, { id: string } & UserType>, res) => {
-    MyUtil.handleHttpRequest(req, res, async () => {
-        const { user } = req;
+router.put(
+    "/:id",
+    [],
+    MyUtil.handleHttpRequest<{ id: string }, UserUdpatableUserFields>(async (req, res) => {
+        const { log, user } = req;
         const { id } = req.params;
 
-        // if (!user) {
-        //     throw "Must login first";
-        // }
+        if (!user) {
+            throw "Must login first";
+        }
 
-        let updates: any = {};
+        let updates: UserUdpatableUserFields = {};
 
-        if (req.body.id === req.params.id || req.body.isAdmin) {
+        if (user._id === req.params.id || user.isAdmin) {
             if (req.body.password) {
                 let password = req.body.password;
 
@@ -36,12 +38,16 @@ router.put("/:id", [], (req: ExpressRequest<{ id: string }, { id: string } & Use
         } else {
             return "There's nothing to be updated";
         }
-    });
-});
+    })
+);
 
 // delete user
-router.delete("/:id", [], (req: ExpressRequest<{ id: string }, { id: string; isAdmin: boolean }>, res) => {
-    MyUtil.handleHttpRequest(req, res, async () => {
+router.delete(
+    "/:id",
+    [],
+    MyUtil.handleHttpRequest<{ id: string }, { id: string; isAdmin: boolean }>(async (req, res) => {
+        const { log } = req;
+
         if (req.body.id === req.params.id || req.body.isAdmin) {
             const { id } = req.params;
 
@@ -59,8 +65,8 @@ router.delete("/:id", [], (req: ExpressRequest<{ id: string }, { id: string; isA
         } else {
             throw "You can only delete your account";
         }
-    });
-});
+    })
+);
 
 // get user
 

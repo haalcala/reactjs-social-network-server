@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 
 const schema = new Schema<UserType>(
     {
-        userId: { type: String, require: true, min: 3, max: 20, unique: true },
         username: { type: String, require: true, min: 3, max: 20, unique: true },
         name: { type: String, required: true },
         email: { type: String, required: true },
@@ -25,7 +24,7 @@ const schema = new Schema<UserType>(
 );
 
 export type UserType = {
-    userId: string;
+    _id: string;
     username: string;
     name: string;
     email: string;
