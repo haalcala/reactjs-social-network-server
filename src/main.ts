@@ -49,10 +49,13 @@ async function start() {
 
     console.log("Creating app");
     const app = new App();
-    app.addUser();
+    await app.addUser();
+    console.log("app:", app);
+
     console.log("Creating app2");
     const app2 = new App();
-    app2.addUser();
+    await app2.addUser();
+    console.log("app2:", app2);
 }
 
 app.get("/", (req, res) => {
