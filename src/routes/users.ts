@@ -19,19 +19,7 @@ router.put(
         //     throw "Must login first";
         // }
 
-        let updates: UserUdpatableUserFields = {};
-
-        const updatable_fields = ["city", "password", "relationship", "country", "name", "followers", "following", "email", "profilePicture", "converPicture", "desc", "hometown"]
-
-        for (let field of Object.keys(req.body)) {
-            if (field !== "id") {
-                if (updatable_fields.indexOf(field) == -1) {
-                    throw `The field ${field} cannot be updated`
-                }
-
-                updates[field] = req.body[field]
-            }
-        }
+        let updates = MyUtil.GetClientUserFields(req.body, true);
 
         if (req.body.id === req.params.id || user.isAdmin) {
             if (updates.password) {
@@ -79,35 +67,42 @@ router.delete(
 );
 
 // get user
-router.get("/:id", [], MyUtil.getHttpRequestHandler<{ id: string }, { id: string }, { names: string[] }>(async (req) => {
-    if (req.body.id === req.params.id) {
-        const { id } = req.params;
+router.get(
+    "/:id",
+    [],
+    MyUtil.getHttpRequestHandler<{ id: string }, { userId: string }, { names: string[] }>(async (req) => {
+        if (req.body.userId === req.params.id) {
+            const { id } = req.params;
 
-        const user = await UserModel.findById(id);
+            const user = await UserModel.findById(id);
 
-        if (!user) {
-            throw { _error: "User not found", _error_code: 505 };
+            if (!user) {
+                throw { _error: "User not found", _error_code: 505 };
+            }
+
+            return { user: MyUtil.GetClientUserFields(user) };
         }
-
-        return { user }
-    }
-}))
+    })
+);
 
 // follow user
-router.get("/:id/follow", [], MyUtil.getHttpRequestHandler<{ id: string }, { id: string }, { names: string[] }>(async (req) => {
-    if (req.body.id === req.params.id) {
-        const { id } = req.params;
+router.get(
+    "/:id/follow",
+    [],
+    MyUtil.getHttpRequestHandler<{ id: string }, { id: string }, { names: string[] }>(async (req) => {
+        if (req.body.id === req.params.id) {
+            const { id } = req.params;
 
-        const user = await UserModel.findById(id);
+            const user = await UserModel.findById(id);
 
-        if (!user) {
-            throw { _error: "User not found", _error_code: 505 };
+            if (!user) {
+                throw { _error: "User not found", _error_code: 505 };
+            }
+
+            return { user };
         }
-
-        return { user }
-    }
-}))
-
+    })
+);
 
 // unfollow user
 

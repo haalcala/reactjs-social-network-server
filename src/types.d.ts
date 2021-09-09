@@ -10,8 +10,8 @@ export interface ExpressResponse {
     _error?: string;
     _error_code?: number;
     _status?: string;
-    user?: UserType
-    users?: UserType[]
+    user?: UserType | UserUdpatableUserFields;
+    users?: UserType[];
 }
 
 export type UserUdpatableUserFields = {
