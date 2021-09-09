@@ -42,6 +42,20 @@ function logProperty(message: string): PropertyDecorator {
     };
 }
 
+function logMethod(message: string): MethodDecorator {
+    console.log(`[Method 🟠] Message is: ${message}`);
+    return function (): void {
+        console.log("[Method 🟠] constructor");
+    };
+}
+
+function logParameter(message: string): ParameterDecorator {
+    console.log(`[Parameter 🔵] Message is: ${message}`);
+    return function (): void {
+        console.log("[Parameter 🔵] constructor");
+    };
+}
+
 @logData("Hello world")
 class User {
     @logProperty("Property message")
@@ -54,14 +68,23 @@ class User {
 
         console.log("User.constructor called.");
     }
+
+    @logMethod("THis is the method")
+    sayHello(@logParameter("This is the parameter!") msg = "Hello") {
+        console.log(`This is ${this.firstName}. ${msg}!`);
+    }
 }
 
 console.log("Creating user ...");
 const user = new User("Spider", "Man");
+user.sayHello();
+user.sayHello();
 console.log("Creating user ... done");
 
 console.log("Creating user2 ...");
 const user2 = new User("Mary", "Jane");
+user2.sayHello();
+user2.sayHello();
 console.log("Creating user2 ... done");
 
 @classDecorator()
