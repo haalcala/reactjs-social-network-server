@@ -52,14 +52,14 @@ async function start() {
     await app.getUser();
     console.log("app:", app);
     // @ts-ignore
-    console.log("app.set_from_MyRoute:", app.set_from_MyRoute);
+    console.log("app.a_date:", app.a_date);
 
     console.log("Creating app2");
     const app2 = new UserRouter();
     await app2.getUser();
     console.log("app2:", app2);
     // @ts-ignore
-    console.log("app2.set_from_MyRoute:", app2.set_from_MyRoute);
+    console.log("app2.a_date:", app2.a_date);
     // @ts-ignore
     console.log("app2.route:", app2.route);
 }

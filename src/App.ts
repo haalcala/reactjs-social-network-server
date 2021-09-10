@@ -3,7 +3,6 @@
 import { log } from "console";
 import { Router } from "express";
 import { MyUtil } from "./my_utils";
-import { UserUdpatableUserFields } from "./types";
 
 function classDecorator(...args: any): ClassDecorator {
     return function <TFunction extends Function>(target: TFunction): TFunction | void {
@@ -22,12 +21,14 @@ function addProperty<T>(name: string, value: T): ClassDecorator {
     };
 }
 
-function MyRouter<T>(path?: string): ClassDecorator {
+function MyRouter<T>(): ClassDecorator {
     console.log(`[Class 🟩] Add property`);
-    return function (target: any): void {
-        target.prototype.consturctor = () => {
-            console.log("--------------------- constructor called!");
-        };
+    return function <TFunction extends Function>(target: TFunction): TFunction | void {
+        console.log(`[Class 🟩] Add property target:${target}`);
+
+        console.log(target.prototype);
+
+        target.prototype.a_date = new Date();
     };
 }
 
@@ -60,25 +61,18 @@ export function methodDecoratorExample(): MethodDecorator {
     };
 }
 
-export function MyRoute<ParamsType = any, ReqBodyType = any, QueryStringType = any>(
+export function MyRoute<ParamsType, ReqBodyType, QueryStringType>(
     path: string,
     method: "get" | "put" | "delete" | "post"
 ): MethodDecorator {
     return function (target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
         console.log("⚠️ DATA", { target, propertyKey, descriptor });
 
-        console.log("typeof(target):", typeof target);
-
         const original = descriptor.value;
 
-        // // @ts-ignore
-        // target.route[method](
-        //     path,
-        //     [],
-        //     MyUtil.getHttpRequestHandler<ParamsType, ReqBodyType, QueryStringType>(async (req) => {
-        //         return await original();
-        //     })
-        // );
+        descriptor.value = MyUtil.getHttpRequestHandler<ParamsType, ReqBodyType, QueryStringType>(async (req) => {
+            return req.body + "";
+        });
     };
 }
 
@@ -154,38 +148,22 @@ console.log("user2:", user2);
 // @ts-ignore
 console.log("user2:", user2.injected);
 
-@MyRouter("/users")
-class UserRouter {
+@MyRouter()
+class App {
     @propertyDecorator(100)
     bla = 2;
 
-    getUser() { }
+    getUser() {}
 
-    @MyRoute<{ id: string }>("/:id", "post")
+    @MyRoute("/:id", "post")
     // @log()
-    async addUser(params, req, res, qry) {
-        console.log("UserRouter.addUser called.");
-        for (let i = 0; i < 1000000000; i++) { }
+    // @methodDecoratorExample()
+    async addUser<T>() {
+        console.log("App.addUser called.");
+        for (let i = 0; i < 1000000000; i++) {}
         await setTimeout(() => console.log("addUser is called"), 3000);
-        console.log("UserRouter.addUser returning.");
-    }
-
-    async register() {
-
+        console.log("App.addUser returning.");
     }
 }
 
-@MyRouter("/auth")
-class AuthRouter {
-
-    @MyRoute("/login", "post")
-    async login() {
-
-    }
-}
-
-class App {
-
-}
-
-export default UserRouter;
+export default App;
