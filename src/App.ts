@@ -3,6 +3,7 @@
 import { log } from "console";
 import { Router } from "express";
 import { MyUtil } from "./my_utils";
+import { UserUdpatableUserFields } from "./types";
 
 function classDecorator(...args: any): ClassDecorator {
     return function <TFunction extends Function>(target: TFunction): TFunction | void {
@@ -21,7 +22,7 @@ function addProperty<T>(name: string, value: T): ClassDecorator {
     };
 }
 
-function MyRouter<T>(): ClassDecorator {
+function MyRouter<T>(path?: string): ClassDecorator {
     console.log(`[Class 🟩] Add property`);
     return function (target: any): void {
         target.prototype.consturctor = () => {
@@ -153,22 +154,38 @@ console.log("user2:", user2);
 // @ts-ignore
 console.log("user2:", user2.injected);
 
-@MyRouter()
-class App {
+@MyRouter("/users")
+class UserRouter {
     @propertyDecorator(100)
     bla = 2;
 
-    getUser() {}
+    getUser() { }
 
     @MyRoute<{ id: string }>("/:id", "post")
     // @log()
-    // @methodDecoratorExample()
-    async addUser<T>() {
-        console.log("App.addUser called.");
-        for (let i = 0; i < 1000000000; i++) {}
+    async addUser(params, req, res, qry) {
+        console.log("UserRouter.addUser called.");
+        for (let i = 0; i < 1000000000; i++) { }
         await setTimeout(() => console.log("addUser is called"), 3000);
-        console.log("App.addUser returning.");
+        console.log("UserRouter.addUser returning.");
+    }
+
+    async register() {
+
     }
 }
 
-export default App;
+@MyRouter("/auth")
+class AuthRouter {
+
+    @MyRoute("/login", "post")
+    async login() {
+
+    }
+}
+
+class App {
+
+}
+
+export default UserRouter;

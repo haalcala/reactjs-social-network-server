@@ -1,5 +1,5 @@
 import { connect } from "mongoose";
-import App from "./App";
+import UserRouter from "./App";
 import UserModel from "./models/User";
 import { setupRoutes } from "./routes";
 
@@ -48,14 +48,14 @@ async function start() {
     // console.log(user);
 
     console.log("Creating app");
-    const app = new App();
+    const app = new UserRouter();
     await app.getUser();
     console.log("app:", app);
     // @ts-ignore
     console.log("app.set_from_MyRoute:", app.set_from_MyRoute);
 
     console.log("Creating app2");
-    const app2 = new App();
+    const app2 = new UserRouter();
     await app2.getUser();
     console.log("app2:", app2);
     // @ts-ignore

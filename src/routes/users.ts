@@ -70,14 +70,16 @@ router.delete(
 router.get(
     "/:id",
     [],
-    MyUtil.getHttpRequestHandler<{ id: string }, { userId: string }, { names: string[] }>(async (req) => {
+    MyUtil.getHttpRequestHandler<{ id: string }, { userId: string }>(async (req) => {
+        const { log } = req
+
         if (req.body.userId === req.params.id) {
             const { id } = req.params;
 
             const user = await UserModel.findById(id);
 
             if (!user) {
-                throw { _error: "User not found", _error_code: 505 };
+                throw { _errors: "User not found", _error_code: 505 };
             }
 
             return { user: MyUtil.GetClientUserFields(user) };
