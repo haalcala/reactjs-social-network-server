@@ -1,8 +1,32 @@
 // https://medium.com/litslink/typescript-decorators-in-examples-c3afcd3c7ff8
 
+import { log } from "console";
+import { Router } from "express";
+import { MyUtil } from "./my_utils";
+
 function classDecorator(...args: any): ClassDecorator {
     return function <TFunction extends Function>(target: TFunction): TFunction | void {
         // do something
+    };
+}
+
+function addProperty<T>(name: string, value: T): ClassDecorator {
+    console.log(`[Class 🟩] Add property`);
+    return function (target: any): void {
+        target.prototype[name] = value;
+        const instance = new target() as User;
+        instance.firstName = "Will";
+        instance.lastName = "Smith";
+        console.log("New user", instance);
+    };
+}
+
+function MyRouter<T>(): ClassDecorator {
+    console.log(`[Class 🟩] Add property`);
+    return function (target: any): void {
+        target.prototype.consturctor = () => {
+            console.log("--------------------- constructor called!");
+        };
     };
 }
 
@@ -19,6 +43,41 @@ function methodDecorator(...args: any): MethodDecorator {
         descriptor: TypedPropertyDescriptor<T>
     ): TypedPropertyDescriptor<T> | void {
         // do something
+    };
+}
+
+export function methodDecoratorExample(): MethodDecorator {
+    return function (target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+        console.log("⚠️ DATA", { target, propertyKey, descriptor });
+
+        const original = descriptor.value;
+
+        descriptor.value = (...args: any) => {
+            const originalResult = original.apply(target, args);
+            return originalResult + 4;
+        };
+    };
+}
+
+export function MyRoute<ParamsType = any, ReqBodyType = any, QueryStringType = any>(
+    path: string,
+    method: "get" | "put" | "delete" | "post"
+): MethodDecorator {
+    return function (target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+        console.log("⚠️ DATA", { target, propertyKey, descriptor });
+
+        console.log("typeof(target):", typeof target);
+
+        const original = descriptor.value;
+
+        // // @ts-ignore
+        // target.route[method](
+        //     path,
+        //     [],
+        //     MyUtil.getHttpRequestHandler<ParamsType, ReqBodyType, QueryStringType>(async (req) => {
+        //         return await original();
+        //     })
+        // );
     };
 }
 
@@ -56,6 +115,7 @@ function logParameter(message: string): ParameterDecorator {
     };
 }
 
+@addProperty("injected", "bla")
 @logData("Hello world")
 class User {
     @logProperty("Property message")
@@ -80,24 +140,34 @@ const user = new User("Spider", "Man");
 user.sayHello();
 user.sayHello();
 console.log("Creating user ... done");
+console.log("user:", user);
+// @ts-ignore
+console.log("user:", user.injected);
 
 console.log("Creating user2 ...");
 const user2 = new User("Mary", "Jane");
 user2.sayHello();
 user2.sayHello();
 console.log("Creating user2 ... done");
+console.log("user2:", user2);
+// @ts-ignore
+console.log("user2:", user2.injected);
 
-@classDecorator()
+@MyRouter()
 class App {
     @propertyDecorator(100)
     bla = 2;
 
     getUser() {}
 
-    @methodDecorator()
+    @MyRoute<{ id: string }>("/:id", "post")
+    // @log()
+    // @methodDecoratorExample()
     async addUser<T>() {
+        console.log("App.addUser called.");
         for (let i = 0; i < 1000000000; i++) {}
         await setTimeout(() => console.log("addUser is called"), 3000);
+        console.log("App.addUser returning.");
     }
 }
 

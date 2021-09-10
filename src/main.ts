@@ -49,13 +49,19 @@ async function start() {
 
     console.log("Creating app");
     const app = new App();
-    await app.addUser();
+    await app.getUser();
     console.log("app:", app);
+    // @ts-ignore
+    console.log("app.set_from_MyRoute:", app.set_from_MyRoute);
 
     console.log("Creating app2");
     const app2 = new App();
-    await app2.addUser();
+    await app2.getUser();
     console.log("app2:", app2);
+    // @ts-ignore
+    console.log("app2.set_from_MyRoute:", app2.set_from_MyRoute);
+    // @ts-ignore
+    console.log("app2.route:", app2.route);
 }
 
 app.get("/", (req, res) => {
